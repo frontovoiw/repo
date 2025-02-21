@@ -86,6 +86,9 @@ nav {
 }
 
 .login-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     background: var(--accent-color);
     color: var(--text-color);
     border: none;
@@ -93,10 +96,16 @@ nav {
     border-radius: 5px;
     cursor: pointer;
     transition: var(--transition);
+    font-weight: 500;
 }
 
 .login-btn:hover {
     background: #ff6a00;
+    transform: translateY(-2px);
+}
+
+.login-btn i {
+    font-size: 1.2rem;
 }
 
 .cart {
@@ -403,4 +412,56 @@ footer {
     .hero-buttons {
         flex-direction: column;
     }
+}
+
+/* Добавляем стили для меню пользователя */
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-color);
+}
+
+.user-name {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--secondary-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 150px;
+}
+
+.user-menu:hover .user-dropdown {
+    display: flex;
+}
+
+.user-dropdown a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 0.5rem;
+    transition: var(--transition);
+}
+
+.user-dropdown a:hover {
+    background: var(--accent-color);
+    border-radius: 3px;
 } 

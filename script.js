@@ -81,6 +81,54 @@ contactForm.addEventListener('submit', (e) => {
     contactForm.reset();
 });
 
+// Проверка авторизации
+let isAuthenticated = false;
+let userInfo = null;
+
+// Функция проверки состояния авторизации
+async function checkAuth() {
+    try {
+        const response = await fetch('check_auth.php');
+        const data = await response.json();
+        
+        if (data.authenticated) {
+            isAuthenticated = true;
+            userInfo = data.user;
+            updateUserInterface();
+        }
+    } catch (error) {
+        console.error('Ошибка проверки авторизации:', error);
+    }
+}
+
+// Обновление интерфейса после авторизации
+function updateUserInterface() {
+    const loginBtn = document.querySelector('.login-btn');
+    
+    if (isAuthenticated && userInfo) {
+        // Создаем меню пользователя
+        const userMenu = document.createElement('div');
+        userMenu.className = 'user-menu';
+        userMenu.innerHTML = `
+            <img src="${userInfo.avatar}" alt="${userInfo.name}" class="user-avatar">
+            <span class="user-name">${userInfo.name}</span>
+            <div class="user-dropdown">
+                <a href="#profile">Профиль</a>
+                <a href="#inventory">Инвентарь</a>
+                <a href="#orders">Заказы</a>
+                <a href="logout.php">Выйти</a>
+            </div>
+        `;
+        
+        // Заменяем кнопку входа на меню пользователя
+        loginBtn.replaceWith(userMenu);
+    } else {
+        loginBtn.addEventListener('click', () => {
+            window.location.href = 'steam_auth.php';
+        });
+    }
+}
+
 // Корзина
 let cart = [];
 const cartCount = document.querySelector('.cart-count');
@@ -93,6 +141,11 @@ function updateCartCount() {
 // Добавление товара в корзину
 document.querySelectorAll('.buy-btn').forEach(button => {
     button.addEventListener('click', (e) => {
+        if (!isAuthenticated) {
+            alert('Пожалуйста, войдите через Steam для совершения покупок');
+            return;
+        }
+
         const product = e.target.closest('.product-card');
         const productName = product.querySelector('h3').textContent;
         const productPrice = product.querySelector('.price').textContent;
@@ -121,9 +174,7 @@ const products = document.querySelectorAll('.product-card');
 
 filterButtons.forEach(button => {
     button.addEventListener('click', () => {
-        // Удаляем активный класс у всех кнопок
         filterButtons.forEach(btn => btn.classList.remove('active'));
-        // Добавляем активный класс нажатой кнопке
         button.classList.add('active');
         
         const category = button.textContent.toLowerCase();
@@ -143,30 +194,14 @@ filterButtons.forEach(button => {
     });
 });
 
-// Анимация появления элементов при прокрутке
-const observerOptions = {
-    threshold: 0.2
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, observerOptions);
-
-document.querySelectorAll('section').forEach(section => {
-    section.style.opacity = '0';
-    section.style.transform = 'translateY(50px)';
-    section.style.transition = 'all 0.5s ease-out';
-    observer.observe(section);
-});
-
 // Открытие кейсов
 document.querySelectorAll('.open-case-btn').forEach(button => {
     button.addEventListener('click', () => {
+        if (!isAuthenticated) {
+            alert('Пожалуйста, войдите через Steam для открытия кейсов');
+            return;
+        }
+
         const caseCard = button.closest('.case-card');
         const caseName = caseCard.querySelector('h3').textContent;
         
@@ -192,11 +227,6 @@ document.querySelectorAll('.open-case-btn').forEach(button => {
     });
 });
 
-// Кнопка входа через Steam
-document.querySelector('.login-btn').addEventListener('click', () => {
-    alert('Переадресация на страницу авторизации Steam...');
-});
-
 // Анимация при наведении на карточки товаров
 document.querySelectorAll('.product-card').forEach(card => {
     card.addEventListener('mouseenter', () => {
@@ -208,4 +238,7 @@ document.querySelectorAll('.product-card').forEach(card => {
         card.style.transform = 'translateY(0)';
         card.style.boxShadow = 'none';
     });
-}); 
+});
+
+// Инициализация проверки авторизации при загрузке страницы
+checkAuth(); 
