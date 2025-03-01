@@ -1,5 +1,0 @@
-{
-    "require": {
-        "invisnik/laravel-steam-auth": "^4.3"
-    }
-} 
